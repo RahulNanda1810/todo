@@ -1,1 +1,91 @@
-/* You can add global styles to this file, and also import other style files */
+/* =========================
+   GLOBAL BASE STYLES
+   ========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text',
+    'Segoe UI', sans-serif;
+  background: transparent;
+}
+
+/* =========================
+   ⏰ SMART TIME-BASED BACKGROUND
+   ========================= */
+
+.animated-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  transition: background 1s ease;
+}
+
+/* 🌅 Morning */
+.theme-morning {
+  background: radial-gradient(circle at top left, #e0f2fe, #fff7ed);
+}
+
+/* ☀️ Afternoon */
+.theme-afternoon {
+  background: radial-gradient(circle at top left, #cffafe, #f0abfc);
+}
+
+/* 🌆 Evening */
+.theme-evening {
+  background: radial-gradient(circle at top left, #c7d2fe, #fed7aa);
+}
+
+/* 🌙 Night */
+.theme-night {
+  background: radial-gradient(circle at top left, #020617, #0f172a);
+}
+
+.bg-blob {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.6;
+  animation: floatBlob 20s infinite ease-in-out;
+}
+
+.bg-blob.a {
+  background: #60a5fa;
+  top: -120px;
+  left: -120px;
+}
+
+.bg-blob.b {
+  background: #a78bfa;
+  top: 30%;
+  right: -140px;
+  animation-delay: -7s;
+}
+
+.bg-blob.c {
+  background: #f472b6;
+  bottom: -140px;
+  left: 25%;
+  animation-delay: -14s;
+}
+
+@keyframes floatBlob {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(80px, -80px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}

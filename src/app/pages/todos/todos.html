@@ -1,0 +1,174 @@
+<div class="app-bg" [class.dark]="isDarkMode">
+  <div class="todo-card">
+    <!-- Header -->
+    <header class="todo-header">
+      <div>
+        <h1>Hi, {{ userName }} 👋</h1>
+        <p class="subtitle">{{ greeting }}</p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-outline" type="button" (click)="toggleDarkMode()">
+          {{ isDarkMode ? '☀️ Light' : '🌙 Dark' }}
+        </button>
+        <button class="btn-outline" type="button" (click)="logout()">
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <section class="stats-row">
+      <div class="stat-chip">
+        <span class="stat-label">TODAY</span>
+        <span class="stat-value">{{ todayTasksCount }}</span>
+      </div>
+      <div class="stat-chip">
+        <span class="stat-label">COMPLETED</span>
+        <span class="stat-value">{{ completedCount }}</span>
+      </div>
+      <div class="stat-chip">
+        <span class="stat-label">HIGH PRIORITY</span>
+        <span class="stat-value">{{ highPriorityCount }}</span>
+      </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="filters">
+      <button
+        class="chip"
+        [class.active]="filter === 'today'"
+        (click)="setFilter('today')"
+      >
+        Today
+      </button>
+      <button
+        class="chip"
+        [class.active]="filter === 'upcoming'"
+        (click)="setFilter('upcoming')"
+      >
+        Upcoming
+      </button>
+      <button
+        class="chip"
+        [class.active]="filter === 'completed'"
+        (click)="setFilter('completed')"
+      >
+        Completed
+      </button>
+      <button
+        class="chip"
+        [class.active]="filter === 'all'"
+        (click)="setFilter('all')"
+      >
+        All
+      </button>
+    </section>
+
+    <!-- New todo -->
+    <section class="new-todo">
+      <form class="new-todo-form" (ngSubmit)="addTodo()">
+        <input
+          type="text"
+          [(ngModel)]="newTodo"
+          name="newTodo"
+          placeholder="What do you want to get done?"
+          class="input-text"
+        />
+
+        <input
+          type="date"
+          [(ngModel)]="newDueDate"
+          name="newDueDate"
+          class="input-date"
+        />
+
+        <select
+          name="priority"
+          [(ngModel)]="newPriority"
+          class="input-select"
+        >
+          <option value="low">Low ⚪</option>
+          <option value="medium">Medium 🟡</option>
+          <option value="high">High 🔴</option>
+        </select>
+
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="!newTodo.trim()"
+        >
+          Add
+        </button>
+      </form>
+
+      <p class="hint">
+        💡 Unfinished overdue tasks are automatically brought to today when you
+        come back.
+      </p>
+    </section>
+
+    <!-- List -->
+    <section class="todo-list-section">
+      <ng-container *ngIf="!loading; else loadingTpl">
+        <p *ngIf="filteredTodos.length === 0" class="empty-state">
+          No tasks here yet. Add something amazing to do 🚀
+        </p>
+
+        <ul class="todo-list" *ngIf="filteredTodos.length > 0">
+          <li
+            *ngFor="let t of filteredTodos"
+            class="todo-item"
+            [class.done]="t.done"
+          >
+            <div class="todo-main">
+              <input
+                type="checkbox"
+                [checked]="t.done"
+                (change)="toggle(t)"
+              />
+              <div class="todo-text-block" (click)="toggle(t)">
+                <span class="todo-text">
+                  {{ t.text }}
+                </span>
+                <div class="todo-meta-row">
+                  <span
+                    class="badge"
+                    [class.badge-today]="isToday(t)"
+                    [class.badge-overdue]="isOverdue(t)"
+                    [class.badge-upcoming]="!isToday(t) && !isOverdue(t)"
+                  >
+                    <ng-container *ngIf="isToday(t)">Today</ng-container>
+                    <ng-container *ngIf="isOverdue(t)">Overdue</ng-container>
+                    <ng-container
+                      *ngIf="!isToday(t) && !isOverdue(t)"
+                    >
+                      {{ t.dueDate }}
+                    </ng-container>
+                  </span>
+
+                  <span
+                    class="badge priority-badge"
+                    [class.priority-low]="t.priority === 'low'"
+                    [class.priority-medium]="t.priority === 'medium'"
+                    [class.priority-high]="t.priority === 'high'"
+                  >
+                    {{ t.priority | titlecase }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-icon" type="button" (click)="remove(t)">
+              ✕
+            </button>
+          </li>
+        </ul>
+      </ng-container>
+
+      <ng-template #loadingTpl>
+        <p class="empty-state">Loading your tasks…</p>
+      </ng-template>
+    </section>
+  </div>
+</div>

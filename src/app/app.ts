@@ -1,12 +1,27 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, CommonModule],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
-export class App {
-  protected readonly title = signal('todo-final');
+export class AppComponent {
+  timeTheme = '';
+
+  constructor() {
+    this.setThemeByTime();
+  }
+
+  setThemeByTime() {
+    const hour = new Date().getHours();
+
+    if (hour < 6) this.timeTheme = 'theme-night';
+    else if (hour < 12) this.timeTheme = 'theme-morning';
+    else if (hour < 18) this.timeTheme = 'theme-afternoon';
+    else this.timeTheme = 'theme-evening';
+  }
 }

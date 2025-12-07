@@ -1,0 +1,61 @@
+<div class="auth-bg">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Welcome 👋</h1>
+      <p class="subtitle">Your smart personal task manager</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button
+        type="button"
+        class="tab"
+        [class.active]="isLogin"
+        (click)="switchMode(true)"
+      >
+        Login
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.active]="!isLogin"
+        (click)="switchMode(false)"
+      >
+        Sign up
+      </button>
+    </div>
+
+    <form class="auth-form" (ngSubmit)="onSubmit()">
+      <div *ngIf="!isLogin" class="field">
+        <label>Name</label>
+        <input [(ngModel)]="name" name="name" />
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input [(ngModel)]="email" name="email" type="email" />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input [(ngModel)]="password" name="password" type="password" />
+      </div>
+
+      <button class="btn-primary" type="submit">
+        {{ isLogin ? 'Login' : 'Sign up' }}
+      </button>
+    </form>
+
+    <p class="error-text" *ngIf="error">{{ error }}</p>
+
+    <button
+      *ngIf="error && error.includes('not verified')"
+      class="btn-primary"
+      style="background:#64748b"
+      (click)="resendVerification()"
+    >
+      Resend verification email
+    </button>
+
+    <p class="info-text" *ngIf="infoMessage">{{ infoMessage }}</p>
+  </div>
+</div>
