@@ -461,3 +461,102 @@
     color: #fee2e2;
   }
 }
+
+// ---------- DAILY TASKS ----------
+
+.daily-tasks-section {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+
+  .app-bg.dark & {
+    border-color: #1f2937;
+  }
+}
+
+.daily-tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+.daily-task-form {
+  display: grid;
+  grid-template-columns: 1.5fr auto auto;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.daily-tasks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.daily-task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  transition: background 0.15s ease;
+
+  .app-bg.dark & {
+    background: #0f172a;
+  }
+
+  &:hover {
+    background: #f3f4f6;
+
+    .app-bg.dark & {
+      background: #1f2937;
+    }
+  }
+}
+
+.daily-task-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.daily-task-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.daily-tasks-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+
+  .app-bg.dark & {
+    color: #9ca3af;
+  }
+}
+
+.empty-state-small {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+
+  .app-bg.dark & {
+    color: #6b7280;
+  }
+}
+

@@ -28,6 +28,14 @@ interface Todo {
   priority: TodoPriority;
 }
 
+interface DailyTask {
+  id: string;
+  text: string;
+  priority: TodoPriority;
+  userId: string;
+  createdAt: any;
+}
+
 @Component({
   selector: 'app-todos',
   standalone: true,
@@ -41,10 +49,15 @@ export class TodosComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   todos: Todo[] = [];
+  dailyTasks: DailyTask[] = [];
 
   newTodo: string = '';
   newDueDate: string = this.getToday();
   newPriority: TodoPriority = 'medium';
+
+  newDailyTask: string = '';
+  newDailyPriority: TodoPriority = 'medium';
+  showDailyTaskForm: boolean = false;
 
   userId: string | null = null;
   loading: boolean = true;
@@ -79,6 +92,7 @@ export class TodosComponent implements OnInit {
       this.greeting = this.buildGreeting(this.userName);
 
       this.loadTodos();
+      this.loadDailyTasks();
     });
   }
 
@@ -98,6 +112,141 @@ export class TodosComponent implements OnInit {
     if (typeof window !== 'undefined') {
       localStorage.setItem('todo-dark-mode', String(this.isDarkMode));
     }
+    this.cdr.markForCheck();
+  }
+
+  // ---------- DAILY TASKS ----------
+
+  async loadDailyTasks() {
+    if (!this.userId) return;
+
+    try {
+      const dailyTasksRef = collection(db, 'dailyTasks');
+      const q = query(dailyTasksRef, where('userId', '==', this.userId));
+      const snap = await getDocs(q);
+
+      this.dailyTasks = snap.docs.map((d) => {
+        const data: any = d.data();
+        return {
+          id: d.id,
+          text: data['text'] ?? '',
+          priority: (data['priority'] as TodoPriority) || 'medium',
+          userId: data['userId'] ?? '',
+          createdAt: data['createdAt'],
+        };
+      });
+
+      // Auto-populate daily tasks for today
+      await this.populateDailyTasksForToday();
+      this.cdr.markForCheck();
+    } catch (e) {
+      console.error('Error loading daily tasks:', e);
+    }
+  }
+
+  private async populateDailyTasksForToday() {
+    if (!this.userId) return;
+
+    const today = this.getToday();
+    const storageKey = `daily-tasks-populated-${today}`;
+
+    // Check if we already populated daily tasks today
+    if (typeof window !== 'undefined') {
+      const alreadyPopulated = localStorage.getItem(storageKey);
+      if (alreadyPopulated === 'true') {
+        return; // Already added today, don't duplicate
+      }
+    }
+
+    try {
+      // Add each daily task as a todo for today
+      for (const dailyTask of this.dailyTasks) {
+        await addDoc(collection(db, 'todos'), {
+          userId: this.userId,
+          text: dailyTask.text,
+          done: false,
+          dueDate: today,
+          priority: dailyTask.priority,
+          createdAt: serverTimestamp(),
+          isFromDailyTask: true,
+        });
+      }
+
+      // Mark that we've populated for today
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, 'true');
+      }
+
+      // Reload todos to show the newly added daily tasks
+      await this.loadTodos();
+    } catch (e) {
+      console.error('Error populating daily tasks:', e);
+    }
+  }
+
+  async addDailyTask() {
+    if (!this.newDailyTask.trim()) {
+      return;
+    }
+    if (!this.userId) {
+      alert('You are not logged in.');
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, 'dailyTasks'), {
+        userId: this.userId,
+        text: this.newDailyTask.trim(),
+        priority: this.newDailyPriority || 'medium',
+        createdAt: serverTimestamp(),
+      });
+
+      this.newDailyTask = '';
+      this.newDailyPriority = 'medium';
+      this.showDailyTaskForm = false;
+
+      // Reload daily tasks
+      await this.loadDailyTasks();
+
+      // Also add today's occurrence immediately so users don't have to add it separately
+      // This guarantees the newly created daily task appears in today's list right away.
+      const today = this.getToday();
+      try {
+        await addDoc(collection(db, 'todos'), {
+          userId: this.userId,
+          text: this.newDailyTask.trim() || '',
+          done: false,
+          dueDate: today,
+          priority: this.newDailyPriority || 'medium',
+          createdAt: serverTimestamp(),
+          isFromDailyTask: true,
+        });
+      } catch (innerErr) {
+        // non-blocking: still continue if creating today's todo fails
+        console.warn('Could not create today\'s todo for new daily task:', innerErr);
+      }
+
+      // Refresh todos to show the new item
+      await this.loadTodos();
+      this.cdr.markForCheck();
+    } catch (e) {
+      console.error('Error adding daily task:', e);
+      alert('Could not add daily task. Check console for details.');
+    }
+  }
+
+  async removeDailyTask(dailyTask: DailyTask) {
+    try {
+      await deleteDoc(doc(db, 'dailyTasks', dailyTask.id));
+      await this.loadDailyTasks();
+      this.cdr.markForCheck();
+    } catch (e) {
+      console.error('Error deleting daily task:', e);
+    }
+  }
+
+  toggleDailyTaskForm() {
+    this.showDailyTaskForm = !this.showDailyTaskForm;
     this.cdr.markForCheck();
   }
 

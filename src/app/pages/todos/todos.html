@@ -65,6 +65,70 @@
       </button>
     </section>
 
+    <!-- Daily Tasks Section -->
+    <section class="daily-tasks-section">
+      <div class="daily-tasks-header">
+        <h3>🔄 Daily Tasks</h3>
+        <button class="btn-outline" type="button" (click)="toggleDailyTaskForm()">
+          {{ showDailyTaskForm ? '✕' : '+ Add' }}
+        </button>
+      </div>
+
+      @if (showDailyTaskForm) {
+        <form class="daily-task-form" (ngSubmit)="addDailyTask()">
+          <input
+            type="text"
+            [(ngModel)]="newDailyTask"
+            name="newDailyTask"
+            placeholder="What task repeats daily?"
+            class="input-text"
+          />
+
+          <select
+            name="dailyPriority"
+            [(ngModel)]="newDailyPriority"
+            class="input-select"
+          >
+            <option value="low">Low ⚪</option>
+            <option value="medium">Medium 🟡</option>
+            <option value="high">High 🔴</option>
+          </select>
+
+          <button type="submit" class="btn-primary" [disabled]="!newDailyTask.trim()">
+            Save Daily Task
+          </button>
+        </form>
+      }
+
+      @if (dailyTasks.length > 0) {
+        <ul class="daily-tasks-list">
+          @for (task of dailyTasks; track task.id) {
+            <li class="daily-task-item">
+              <div class="daily-task-content">
+                <span class="daily-task-text">{{ task.text }}</span>
+                <span
+                  class="badge priority-badge"
+                  [class.priority-low]="task.priority === 'low'"
+                  [class.priority-medium]="task.priority === 'medium'"
+                  [class.priority-high]="task.priority === 'high'"
+                >
+                  {{ task.priority | titlecase }}
+                </span>
+              </div>
+              <button class="btn-icon" type="button" (click)="removeDailyTask(task)">
+                ✕
+              </button>
+            </li>
+          }
+        </ul>
+        <p class="daily-tasks-hint">
+          💡 These tasks are automatically added to today's list each day.
+        </p>
+      } @else {
+        <p class="empty-state-small">No daily tasks yet. Add one above!</p>
+      }
+    </section>
+
     <!-- New todo -->
     <section class="new-todo">
       <form class="new-todo-form" (ngSubmit)="addTodo()">
