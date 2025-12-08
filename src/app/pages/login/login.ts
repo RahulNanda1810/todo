@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -22,6 +23,7 @@ import {
 })
 export class LoginComponent {
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   name = '';
   email = '';
@@ -87,6 +89,7 @@ export class LoginComponent {
     } catch (err: any) {
       console.error('Auth error:', err);
       this.error = this.mapFirebaseError(err);
+      this.cdr.markForCheck();
     } finally {
       this.loading = false;
     }
@@ -96,17 +99,20 @@ export class LoginComponent {
     const user = auth.currentUser;
     if (!user) {
       this.error = 'Please log in again first.';
+      this.cdr.markForCheck();
       return;
     }
 
     await sendEmailVerification(user);
     this.infoMessage = 'Verification email resent! Check your inbox or spam.';
+    this.cdr.markForCheck();
   }
 
   switchMode(isLogin: boolean) {
     this.isLogin = isLogin;
     this.error = '';
     this.infoMessage = '';
+    this.cdr.markForCheck();
   }
 
   private mapFirebaseError(err: any): string {
