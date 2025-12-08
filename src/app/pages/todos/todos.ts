@@ -194,13 +194,19 @@ export class TodosComponent implements OnInit {
     }
 
     try {
+      // capture values before clearing the form
+      const text = this.newDailyTask.trim();
+      const priority = this.newDailyPriority || 'medium';
+
+      // create the daily task record
       await addDoc(collection(db, 'dailyTasks'), {
         userId: this.userId,
-        text: this.newDailyTask.trim(),
-        priority: this.newDailyPriority || 'medium',
+        text,
+        priority,
         createdAt: serverTimestamp(),
       });
 
+      // reset the UI form
       this.newDailyTask = '';
       this.newDailyPriority = 'medium';
       this.showDailyTaskForm = false;
@@ -208,22 +214,21 @@ export class TodosComponent implements OnInit {
       // Reload daily tasks
       await this.loadDailyTasks();
 
-      // Also add today's occurrence immediately so users don't have to add it separately
-      // This guarantees the newly created daily task appears in today's list right away.
+      // Also add today's occurrence immediately using captured values
       const today = this.getToday();
       try {
         await addDoc(collection(db, 'todos'), {
           userId: this.userId,
-          text: this.newDailyTask.trim() || '',
+          text,
           done: false,
           dueDate: today,
-          priority: this.newDailyPriority || 'medium',
+          priority,
           createdAt: serverTimestamp(),
           isFromDailyTask: true,
         });
       } catch (innerErr) {
         // non-blocking: still continue if creating today's todo fails
-        console.warn('Could not create today\'s todo for new daily task:', innerErr);
+        console.warn("Could not create today's todo for new daily task:", innerErr);
       }
 
       // Refresh todos to show the new item
