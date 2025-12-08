@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build"
+  # Angular 21 default output is dist/{project} — Netlify should publish that folder.
+  publish = "dist/todo-final"
+
+[dev]
+  command = "npm start"
+  port = 4200
