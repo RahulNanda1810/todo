@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -37,6 +37,9 @@ interface Todo {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TodosComponent implements OnInit {
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+
   todos: Todo[] = [];
 
   newTodo: string = '';
@@ -51,8 +54,6 @@ export class TodosComponent implements OnInit {
   filter: TodoFilter = 'today';
 
   isDarkMode: boolean = false;
-
-  constructor(private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     // restore dark mode preference

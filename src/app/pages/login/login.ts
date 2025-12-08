@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -18,8 +18,11 @@ import {
   imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
+  private router = inject(Router);
+
   name = '';
   email = '';
   password = '';
@@ -28,8 +31,6 @@ export class LoginComponent {
   loading = false;
   error = '';
   infoMessage = '';
-
-  constructor(private router: Router) {}
 
   async onSubmit() {
     this.error = '';

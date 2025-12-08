@@ -1,9 +1,13 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './pages/login/login';
-import { TodosComponent } from './pages/todos/todos';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'todos', component: TodosComponent },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent),
+  },
+  {
+    path: 'todos',
+    loadComponent: () => import('./pages/todos/todos').then(m => m.TodosComponent),
+  },
 ];
