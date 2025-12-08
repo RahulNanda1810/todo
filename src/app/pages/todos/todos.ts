@@ -98,6 +98,7 @@ export class TodosComponent implements OnInit {
     if (typeof window !== 'undefined') {
       localStorage.setItem('todo-dark-mode', String(this.isDarkMode));
     }
+    this.cdr.markForCheck();
   }
 
   // ---------- LOAD TODOS ----------
@@ -146,6 +147,7 @@ export class TodosComponent implements OnInit {
       alert('Error loading todos. Check browser console for details: ' + String(e));
     } finally {
       this.loading = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -230,6 +232,7 @@ export class TodosComponent implements OnInit {
       this.newPriority = 'medium';
 
       await this.loadTodos();
+      this.cdr.markForCheck();
     } catch (e) {
       console.error('Error adding todo:', e);
       alert(
@@ -244,6 +247,7 @@ export class TodosComponent implements OnInit {
         done: !todo.done,
       });
       await this.loadTodos();
+      this.cdr.markForCheck();
     } catch (e) {
       console.error('Error updating todo:', e);
     }
@@ -253,6 +257,7 @@ export class TodosComponent implements OnInit {
     try {
       await deleteDoc(doc(db, 'todos', todo.id));
       await this.loadTodos();
+      this.cdr.markForCheck();
     } catch (e) {
       console.error('Error deleting todo:', e);
     }
