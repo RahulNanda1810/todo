@@ -40,6 +40,16 @@
         <input [(ngModel)]="password" name="password" type="password" />
       </div>
 
+      <div *ngIf="!isLogin" class="password-rules">
+        <p class="hint">Password rules:</p>
+        <ul>
+          <li>Minimum 6 characters</li>
+          <li>Must include at least one uppercase letter</li>
+          <li>Must include at least one lowercase letter</li>
+          <li>Must include at least one special character (e.g. !@#$%)</li>
+        </ul>
+      </div>
+
       <button class="btn-primary" type="submit">
         {{ isLogin ? 'Login' : 'Sign up' }}
       </button>

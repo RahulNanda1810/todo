@@ -57,6 +57,14 @@ export class LoginComponent {
         this.router.navigate(['/todos']);
       } else {
         // ✅ SIGNUP WITH EMAIL VERIFICATION
+        // Client-side password rules validation
+        const pwError = this.validatePassword(this.password);
+        if (pwError) {
+          this.error = pwError;
+          this.loading = false;
+          return;
+        }
+
         const cred = await createUserWithEmailAndPassword(
           auth,
           this.email,
@@ -71,8 +79,8 @@ export class LoginComponent {
         // ✅ SEND VERIFICATION EMAIL
         await sendEmailVerification(cred.user);
 
-        this.infoMessage =
-          'Account created! A verification email has been sent. Please verify before logging in.';
+        // User feedback
+        this.infoMessage = 'User successfully created. Verification email sent.';
         this.isLogin = true;
         this.password = '';
       }
@@ -108,9 +116,8 @@ export class LoginComponent {
       case 'auth/invalid-email':
         return 'That email address looks invalid.';
       case 'auth/user-not-found':
-        return 'No account found with this email. Try signing up.';
       case 'auth/wrong-password':
-        return 'Incorrect password. Please try again.';
+        return 'Invalid username or password.';
       case 'auth/email-already-in-use':
         return 'An account already exists with this email.';
       case 'auth/weak-password':
@@ -118,5 +125,21 @@ export class LoginComponent {
       default:
         return err?.message || 'Something went wrong. Please try again.';
     }
+  }
+
+  private validatePassword(pw: string): string | null {
+    if (!pw || pw.length < 6) {
+      return 'Password must be at least 6 characters long.';
+    }
+
+    const hasUpper = /[A-Z]/.test(pw);
+    const hasLower = /[a-z]/.test(pw);
+    const hasSpecial = /[^A-Za-z0-9]/.test(pw);
+
+    if (!hasUpper || !hasLower || !hasSpecial) {
+      return 'Password must include uppercase, lowercase, and a special character.';
+    }
+
+    return null;
   }
 }
