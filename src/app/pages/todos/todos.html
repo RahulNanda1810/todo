@@ -11,6 +11,9 @@
         <button class="btn-outline" type="button" (click)="toggleDarkMode()">
           {{ isDarkMode ? '☀️ Light' : '🌙 Dark' }}
         </button>
+        <button class="btn-outline" type="button" (click)="openDailyTasks()">
+          Daily
+        </button>
         <button class="btn-outline" type="button" (click)="logout()">
           Logout
         </button>
@@ -65,66 +68,7 @@
       </button>
     </section>
 
-    <!-- Daily Tasks Section -->
-    <section class="daily-tasks-section">
-      <div class="daily-tasks-header">
-        <h3>🔄 Daily Tasks</h3>
-        <button class="btn-outline" type="button" (click)="toggleDailyTaskForm()">
-          {{ showDailyTaskForm ? '✕' : '+ Add' }}
-        </button>
-      </div>
-
-      <form *ngIf="showDailyTaskForm" class="daily-task-form" (ngSubmit)="addDailyTask()">
-        <input
-          type="text"
-          [(ngModel)]="newDailyTask"
-          name="newDailyTask"
-          placeholder="What task repeats daily?"
-          class="input-text"
-        />
-
-        <select
-          name="dailyPriority"
-          [(ngModel)]="newDailyPriority"
-          class="input-select"
-        >
-          <option value="low">Low ⚪</option>
-          <option value="medium">Medium 🟡</option>
-          <option value="high">High 🔴</option>
-        </select>
-
-        <button type="submit" class="btn-primary" [disabled]="!newDailyTask.trim()">
-          Save Daily Task
-        </button>
-      </form>
-
-      <ng-container *ngIf="dailyTasks.length > 0; else noDailyTasks">
-        <ul class="daily-tasks-list">
-          <li class="daily-task-item" *ngFor="let task of dailyTasks">
-            <div class="daily-task-content">
-              <span class="daily-task-text">{{ task.text }}</span>
-              <span
-                class="badge priority-badge"
-                [class.priority-low]="task.priority === 'low'"
-                [class.priority-medium]="task.priority === 'medium'"
-                [class.priority-high]="task.priority === 'high'"
-              >
-                {{ task.priority | titlecase }}
-              </span>
-            </div>
-            <button class="btn-icon" type="button" (click)="removeDailyTask(task)">
-              ✕
-            </button>
-          </li>
-        </ul>
-        <p class="daily-tasks-hint">
-          💡 These tasks are automatically added to today's list each day.
-        </p>
-      </ng-container>
-      <ng-template #noDailyTasks>
-        <p class="empty-state-small">No daily tasks yet. Add one above!</p>
-      </ng-template>
-    </section>
+    <!-- Daily tasks are managed via modal (open with header 'Daily' button) -->
 
     <!-- New todo -->
     <section class="new-todo">
@@ -231,5 +175,78 @@
         <p class="empty-state">Loading your tasks…</p>
       </ng-template>
     </section>
+    
+    <!-- Daily Tasks Modal -->
+    <div class="modal-backdrop" *ngIf="showDailyTaskModal">
+      <div class="modal-card">
+        <header class="modal-header">
+          <h3>🔄 Daily Tasks</h3>
+          <button class="btn-icon" type="button" (click)="closeDailyTasks()">✕</button>
+        </header>
+
+        <div class="modal-body">
+          <div class="daily-tasks-header">
+            <button class="btn-outline" type="button" (click)="toggleDailyTaskForm()">
+              {{ showDailyTaskForm ? '✕' : '+ Add' }}
+            </button>
+          </div>
+
+          <form *ngIf="showDailyTaskForm" class="daily-task-form" (ngSubmit)="addDailyTask()">
+            <input
+              type="text"
+              [(ngModel)]="newDailyTask"
+              name="newDailyTask"
+              placeholder="What task repeats daily?"
+              class="input-text"
+            />
+
+            <select
+              name="dailyPriority"
+              [(ngModel)]="newDailyPriority"
+              class="input-select"
+            >
+              <option value="low">Low ⚪</option>
+              <option value="medium">Medium 🟡</option>
+              <option value="high">High 🔴</option>
+            </select>
+
+            <button type="submit" class="btn-primary" [disabled]="!newDailyTask.trim()">
+              Save Daily Task
+            </button>
+          </form>
+
+          <ng-container *ngIf="dailyTasks.length > 0; else noDailyTasksModal">
+            <ul class="daily-tasks-list">
+              <li class="daily-task-item" *ngFor="let task of dailyTasks">
+                <div class="daily-task-content">
+                  <span class="daily-task-text">{{ task.text }}</span>
+                  <span
+                    class="badge priority-badge"
+                    [class.priority-low]="task.priority === 'low'"
+                    [class.priority-medium]="task.priority === 'medium'"
+                    [class.priority-high]="task.priority === 'high'"
+                  >
+                    {{ task.priority | titlecase }}
+                  </span>
+                </div>
+                <button class="btn-icon" type="button" (click)="removeDailyTask(task)">
+                  ✕
+                </button>
+              </li>
+            </ul>
+            <p class="daily-tasks-hint">
+              💡 These tasks are automatically added to today's list each day.
+            </p>
+          </ng-container>
+          <ng-template #noDailyTasksModal>
+            <p class="empty-state-small">No daily tasks yet. Add one above!</p>
+          </ng-template>
+        </div>
+
+        <footer class="modal-footer">
+          <button class="btn-outline" (click)="closeDailyTasks()">Close</button>
+        </footer>
+      </div>
+    </div>
   </div>
 </div>

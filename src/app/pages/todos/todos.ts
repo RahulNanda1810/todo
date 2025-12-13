@@ -58,6 +58,7 @@ export class TodosComponent implements OnInit {
   newDailyTask: string = '';
   newDailyPriority: TodoPriority = 'medium';
   showDailyTaskForm: boolean = false;
+  showDailyTaskModal: boolean = false;
 
   userId: string | null = null;
   loading: boolean = true;
@@ -252,6 +253,18 @@ export class TodosComponent implements OnInit {
 
   toggleDailyTaskForm() {
     this.showDailyTaskForm = !this.showDailyTaskForm;
+    this.cdr.markForCheck();
+  }
+
+  openDailyTasks() {
+    this.showDailyTaskModal = true;
+    // refresh the list when opening
+    this.loadDailyTasks();
+    this.cdr.markForCheck();
+  }
+
+  closeDailyTasks() {
+    this.showDailyTaskModal = false;
     this.cdr.markForCheck();
   }
 
